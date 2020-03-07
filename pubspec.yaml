@@ -17,6 +17,8 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  injectable: ^0.3.0
+  get_it: ^4.0.0
   logger: ^0.8.3
   bloc: ^3.0.0
   flutter_bloc: ^3.2.0
@@ -30,6 +32,8 @@ dependencies:
   cupertino_icons: ^0.1.2
 
 dev_dependencies:
+  build_runner:
+  injectable_generator: ^0.3.0
   flutter_test:
     sdk: flutter
 
