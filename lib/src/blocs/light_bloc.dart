@@ -9,7 +9,7 @@ class LightBloc extends Bloc<GestureEvent, int> {
   @override
   Stream<int> mapEventToState(GestureEvent event) async* {
     yield event.type.join(
-        (e) => -1, // UnTapEvent
+        (e) => 0, // UnTapEvent
         (e) => e.cell); // TapEvent
   }
 }

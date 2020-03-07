@@ -35,7 +35,7 @@ class LightCell extends StatelessWidget {
       child: BlocBuilder<LightBloc, int>(builder: (context, lightId) {
         if (lightId == id) {
           flutterMidi.playMidiNote(midi: note);
-        } else if(lightId == -1) {
+        } else if(lightId == 0) {
           flutterMidi.stopMidiNote(midi: note);
         }
         return Container(
