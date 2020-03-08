@@ -7,7 +7,7 @@ void main() {
   
   GameEngineBloc gameEngine;
 
-  final GameState initial = GameState(nbCells: 4, level: 1, score: 0, record: [], status: GameStatus.setup);
+  final GameState expectedInitial = GameState(nbCells: 4, level: 1, score: 0, record: [], status: GameStatus.setup);
 
   setUp(() {
     gameEngine = GameEngineBloc();
@@ -17,28 +17,31 @@ void main() {
     gameEngine?.close();
   });
 
-  test('Game should start at level 1', () {
-    expect(gameEngine.initialState.level, 1);
-  });
-
-  test('Game should start at score 0', () {
-    expect(gameEngine.initialState.score, 0);
-  });
-
-  test('Game should start with setup status', () {
-    expect(gameEngine.initialState.status, GameStatus.setup);
-  });
-
   test('Game should start with correct state', () {
-    expect(gameEngine.initialState, initial);
+
+    expect(gameEngine.initialState, expectedInitial);
   });
 
-  test('When game starts, Then status is listen', () {
+  test('When game starts, Then status is finally listen', () {
 
     // THEN
     expectLater(gameEngine, emitsInOrder(
-      [initial, initial.copyWith(status: GameStatus.listen)]
+      [expectedInitial, expectedInitial.copyWith(status: GameStatus.listen)]
     ));
+
+    // WHEN
+    gameEngine.add(GameEvent.startEvent());
+  });
+
+  test('When game starts, Then a record is filled', () {
+    // GIVEN
+
+    // THEN
+    gameEngine.listen(expectAsync1((gameState) {
+      if (gameState.status == GameStatus.listen) {
+        expect(gameState.record.length, greaterThan(0));
+      }
+    }, count: 2));
 
     // WHEN
     gameEngine.add(GameEvent.startEvent());
