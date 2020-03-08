@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_midi/flutter_midi.dart';
+import 'package:injectable/injectable.dart';
 import 'package:memory_lights/src/blocs/light_bloc.dart';
 import 'package:memory_lights/src/models/events.dart';
 
+@injectable
 class LightCell extends StatelessWidget {
   final int id;
 
@@ -15,7 +17,11 @@ class LightCell extends StatelessWidget {
 
   final int note;
 
-  LightCell(this.id, this.color, this.highlight, this.flutterMidi, this.note);
+  LightCell(@factoryParam LightCellProperties props, this.flutterMidi) :
+  id = props.id,
+  color = props.color,
+  highlight = props.highlight,
+  note = props.note;
 
   @override
   Widget build(BuildContext context) {
@@ -47,4 +53,17 @@ class LightCell extends StatelessWidget {
         );
       }));
   }
+}
+
+class LightCellProperties {
+  final int id;
+
+  final Color color;
+
+  final Color highlight;
+
+  final int note;
+
+  LightCellProperties(this.id, this.color, this.highlight, this.note);
+  
 }
