@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:memory_lights/src/models/events.dart';
+import 'package:memory_lights/src/blocs/events.dart';
 
 class LightBloc extends Bloc<GestureEvent, int> {
   @override

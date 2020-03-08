@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_midi/flutter_midi.dart';
 import 'package:injectable/injectable.dart';
 import 'package:memory_lights/src/blocs/light_bloc.dart';
-import 'package:memory_lights/src/models/events.dart';
+import 'package:memory_lights/src/blocs/events.dart';
 
 @injectable
 class LightCell extends StatelessWidget {
