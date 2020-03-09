@@ -1,7 +1,9 @@
 import 'dart:math';
 
+import 'package:injectable/injectable.dart';
 import 'package:quiver/check.dart';
 
+@singleton
 class RecordProvider {
   final random = Random();
 

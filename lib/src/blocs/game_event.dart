@@ -1,11 +1,7 @@
-import 'package:equatable/equatable.dart';
 import 'package:memory_lights/src/models/game_state.dart';
 import 'package:sealed_unions/sealed_unions.dart';
 
-abstract class AbstractEvent extends Equatable {
-  @override
-  List<Object> get props => [];
-}
+import 'events.dart';
 
 class StartEvent extends AbstractEvent {
   final GameState gameState;

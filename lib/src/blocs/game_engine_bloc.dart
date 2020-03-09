@@ -1,18 +1,25 @@
 import 'package:bloc/bloc.dart';
+import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
+import 'package:memory_lights/src/blocs/play_event.dart';
+import 'package:memory_lights/src/blocs/play_record_bloc.dart';
 import 'package:memory_lights/src/models/game_state.dart';
 import 'package:memory_lights/src/utils/record_provider.dart';
 
+import 'events.dart';
 import 'game_event.dart';
 
 final logger = Logger();
 
+@singleton
 class GameEngineBloc extends Bloc<GameEvent, GameState> {
   GameState _gameState;
 
-  RecordProvider recordProvider;
+  final RecordProvider recordProvider;
 
-  GameEngineBloc(this.recordProvider)
+  final PlayRecordBloc playRecordBloc;
+
+  GameEngineBloc(this.recordProvider, this.playRecordBloc)
       : _gameState = GameState(
             nbCells: 4,
             level: 1,
@@ -36,6 +43,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
           status: GameStatus.listen,
           record: recordProvider.get(_gameState.level + 2, _gameState.nbCells)
         );
+        playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
       }
     } else {
       // TODO : check GameState correctness
