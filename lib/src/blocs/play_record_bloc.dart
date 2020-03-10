@@ -3,10 +3,13 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:logger/logger.dart';
 import 'package:memory_lights/src/utils/int_ticker.dart';
 
 import 'play_event.dart';
 import 'play_state.dart';
+
+final Logger logger = Logger();
 
 @singleton
 class PlayRecordBloc extends Bloc<PlayRecordEvent, PlayState> {

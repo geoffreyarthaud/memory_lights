@@ -5,5 +5,5 @@ import 'src/di/injection.dart';
 
 void main() {
     configureInjection(Env.prod);
-    runApp(MyApp());
+    runApp(getIt<MyApp>());
 } 
