@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_midi/flutter_midi.dart';
 import 'package:injectable/injectable.dart';
 import 'package:memory_lights/src/blocs/game_engine_bloc.dart';
 import 'package:memory_lights/src/blocs/game_event.dart';
@@ -12,11 +10,10 @@ import 'light_cell.dart';
 
 @singleton
 class LightsPage extends StatelessWidget {
-  final FlutterMidi flutterMidi;
 
   final GameEngineBloc gameEngineBloc;
 
-  LightsPage(this.flutterMidi, this.gameEngineBloc)
+  LightsPage(this.gameEngineBloc)
       : title = 'Memory lights',
         super();
 

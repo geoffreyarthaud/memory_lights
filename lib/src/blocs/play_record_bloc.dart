@@ -32,11 +32,14 @@ class PlayRecordBloc extends Bloc<PlayRecordEvent, PlayState> {
   }
 
   Stream<PlayState> _mapPlayToState(PlayEvent e) async* {
-    yield Playing(0);
+    yield Paused();
     _tickerSubscription?.cancel();
     _tickerSubscription = IntTicker
       .tick(e.record, duration)
-      .listen((note) => add(PlayRecordEvent.tick(note)));
+      .listen((note) => add(PlayRecordEvent.tick(note)),
+      onDone: () {
+        add(PlayRecordEvent.stop());
+      });
 
   }
 

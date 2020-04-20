@@ -9,6 +9,7 @@ import 'package:memory_lights/src/blocs/events.dart';
 import 'package:memory_lights/src/blocs/light_bloc.dart';
 import 'package:memory_lights/src/blocs/play_record_bloc.dart';
 import 'package:memory_lights/src/blocs/play_state.dart';
+import 'package:memory_lights/src/utils/midi_player.dart';
 
 @injectable
 class LightCell extends StatelessWidget {
@@ -18,7 +19,7 @@ class LightCell extends StatelessWidget {
 
   final Color highlight;
 
-  final FlutterMidi flutterMidi;
+  final MidiPlayer flutterMidi;
 
   final int note;
 
@@ -82,6 +83,9 @@ class LightCell extends StatelessWidget {
         color: shouldPlay ? highlight : color
       );
     });
+  }
+
+  handleError() {
   }
 }
 
