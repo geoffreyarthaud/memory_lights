@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
 import 'package:memory_lights/src/blocs/play_event.dart';
 import 'package:memory_lights/src/blocs/play_record_bloc.dart';
+import 'package:memory_lights/src/blocs/play_state.dart';
 import 'package:memory_lights/src/models/game_state.dart';
 import 'package:memory_lights/src/utils/record_provider.dart';
 
@@ -26,7 +27,13 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
             score: 0,
             record: [],
             status: GameStatus.setup),
-        super();
+        super() {
+          playRecordBloc.listen((ps) {
+            if (_gameState.status == GameStatus.listen && ps  == Stopped()) {
+              add(GameEvent.humanPlayEvent());
+            }
+          });
+        }
 
   @override
   GameState get initialState => _gameState;
@@ -54,7 +61,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   GameState _onHumanPlay(HumanPlayEvent humanPlayEvent) {
     // TODO
-    return _gameState;
+    return _gameState.copyWith(status: GameStatus.reproduce);
   }
 
   GameState _onHumanError(HumanErrorEvent humanErrorEvent) {

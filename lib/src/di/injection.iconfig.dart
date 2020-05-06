@@ -6,6 +6,7 @@
 
 import 'package:memory_lights/src/utils/record_provider.dart';
 import 'package:memory_lights/src/blocs/play_record_bloc.dart';
+import 'package:memory_lights/src/blocs/game_bloc_delegate.dart';
 import 'package:memory_lights/src/blocs/light_bloc.dart';
 import 'package:memory_lights/src/blocs/game_engine_bloc.dart';
 import 'package:memory_lights/src/ui/lights_page.dart';
@@ -29,13 +30,14 @@ void $initGetIt(GetIt g, {String environment}) {
   //Eager singletons must be registered in the right order
   g.registerSingleton<RecordProvider>(RecordProvider());
   g.registerSingleton<PlayRecordBloc>(PlayRecordBloc());
+  g.registerSingleton<GameBlocDelegate>(GameBlocDelegate());
   g.registerSingleton<LightBloc>(LightBloc());
   g.registerSingleton<GameEngineBloc>(
       GameEngineBloc(g<RecordProvider>(), g<PlayRecordBloc>()));
   g.registerSingleton<LightsPage>(LightsPage(g<GameEngineBloc>()));
   g.registerSingleton<FlutterMidi>(lightModule.flutterMidi);
   g.registerSingleton<MidiPlayer>(MidiPlayer(g<FlutterMidi>()));
-  g.registerSingleton<MyApp>(MyApp(g<LightsPage>()));
+  g.registerSingleton<MyApp>(MyApp(g<LightsPage>(), g<GameBlocDelegate>()));
 }
 
 class _$LightModule extends LightModule {}
