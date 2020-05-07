@@ -14,7 +14,7 @@ void main() {
   test('When play event of one note 42, then emits this note after initialization', () {
     // THEN
     expectLater(playRecordBloc, emitsInOrder(
-      [Stopped(), Playing(0), Playing(42)]
+      [Stopped(), Paused(), Playing(42)]
     ));
 
     // WHEN
@@ -24,7 +24,7 @@ void main() {
     test('When play event of four note 4,2,3,5, then emits theses notes after initialization', () {
     // THEN
     expectLater(playRecordBloc, emitsInOrder(
-      [Stopped(), Playing(0), Playing(4), Playing(2), Playing(3), Playing(5)]
+      [Stopped(), Paused(), Playing(4), Playing(2), Playing(3), Playing(5)]
     ));
 
     // WHEN

@@ -352,3 +352,7 @@ build/
 **/flutter_export_environment.sh
 
 .dart_tool/
+
+android/.settings/
+
+android/app/.settings/
