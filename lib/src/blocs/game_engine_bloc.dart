@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:logger/logger.dart';
+import 'package:memory_lights/src/blocs/light_bloc.dart';
 import 'package:memory_lights/src/blocs/play_event.dart';
 import 'package:memory_lights/src/blocs/play_record_bloc.dart';
 import 'package:memory_lights/src/blocs/play_state.dart';
@@ -16,24 +19,24 @@ final logger = Logger();
 class GameEngineBloc extends Bloc<GameEvent, GameState> {
   GameState _gameState;
 
+  bool detectPlayRecordStop = false;
+
   final RecordProvider recordProvider;
 
   final PlayRecordBloc playRecordBloc;
 
-  GameEngineBloc(this.recordProvider, this.playRecordBloc)
+  final LightBloc lightBloc;
+
+  StreamSubscription<PlayState> playRecordSubscription;
+
+  GameEngineBloc(this.recordProvider, this.playRecordBloc, this.lightBloc)
       : _gameState = GameState(
             nbCells: 4,
             level: 1,
             score: 0,
             record: [],
             status: GameStatus.setup),
-        super() {
-          playRecordBloc.listen((ps) {
-            if (_gameState.status == GameStatus.listen && ps  == Stopped()) {
-              add(GameEvent.humanPlayEvent());
-            }
-          });
-        }
+        super();
 
   @override
   GameState get initialState => _gameState;
@@ -50,6 +53,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
           status: GameStatus.listen,
           record: recordProvider.get(_gameState.level + 2, _gameState.nbCells)
         );
+        playRecordSubscription = playRecordBloc.listen(onPlayRecord);
         playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
       }
     } else {
@@ -80,4 +84,15 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
       return false;
     }
   }
+
+  void onPlayRecord(PlayState ps) {
+    if (!detectPlayRecordStop && ps is Playing) {
+      detectPlayRecordStop = true;
+    } else if (detectPlayRecordStop && ps is Stopped) {
+      playRecordSubscription.cancel();
+      add(GameEvent.humanPlayEvent());
+    }
+  }
+
+
 }

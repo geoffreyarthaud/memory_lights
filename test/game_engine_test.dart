@@ -1,5 +1,6 @@
 import 'package:memory_lights/src/blocs/game_engine_bloc.dart';
 import 'package:memory_lights/src/blocs/game_event.dart';
+import 'package:memory_lights/src/blocs/light_bloc.dart';
 import 'package:memory_lights/src/blocs/play_event.dart';
 import 'package:memory_lights/src/blocs/play_record_bloc.dart';
 import 'package:memory_lights/src/models/game_state.dart';
@@ -9,11 +10,13 @@ import 'package:test/test.dart';
 
 class MockRecordProvider extends Mock implements RecordProvider {}
 class MockPlayRecordBloc extends Mock implements PlayRecordBloc {}
+class MockLightBloc extends Mock implements LightBloc {}
 
 void main() {
   
   MockRecordProvider mockRecordProvider; 
   MockPlayRecordBloc mockPlayRecordBloc;
+  MockLightBloc mockLightBloc;
 
   GameEngineBloc gameEngine;
 
@@ -22,12 +25,14 @@ void main() {
   setUp(() {
     mockRecordProvider = MockRecordProvider();
     mockPlayRecordBloc = MockPlayRecordBloc();
-    gameEngine = GameEngineBloc(mockRecordProvider, mockPlayRecordBloc);
+    mockLightBloc = MockLightBloc();
+    gameEngine = GameEngineBloc(mockRecordProvider, mockPlayRecordBloc, mockLightBloc);
   });
 
   tearDown(() {
     gameEngine?.close();
     mockPlayRecordBloc?.close();
+    mockLightBloc?.close();
   });
 
   test('Game should start with correct state', () {

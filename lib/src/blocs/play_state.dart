@@ -14,6 +14,11 @@ class Playing extends PlayState {
 
   @override
   List<Object> get props => [note];
+
+  @override
+  String toString() {
+    return "Playing " + note.toString();
+  }
 }
 
 class Paused extends PlayState {}

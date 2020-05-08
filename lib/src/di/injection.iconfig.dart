@@ -32,8 +32,11 @@ void $initGetIt(GetIt g, {String environment}) {
   g.registerSingleton<PlayRecordBloc>(PlayRecordBloc());
   g.registerSingleton<GameBlocDelegate>(GameBlocDelegate());
   g.registerSingleton<LightBloc>(LightBloc());
-  g.registerSingleton<GameEngineBloc>(
-      GameEngineBloc(g<RecordProvider>(), g<PlayRecordBloc>()));
+  g.registerSingleton<GameEngineBloc>(GameEngineBloc(
+    g<RecordProvider>(),
+    g<PlayRecordBloc>(),
+    g<LightBloc>(),
+  ));
   g.registerSingleton<LightsPage>(LightsPage(g<GameEngineBloc>()));
   g.registerSingleton<FlutterMidi>(lightModule.flutterMidi);
   g.registerSingleton<MidiPlayer>(MidiPlayer(g<FlutterMidi>()));

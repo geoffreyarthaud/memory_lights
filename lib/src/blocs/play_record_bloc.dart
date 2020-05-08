@@ -63,7 +63,7 @@ class PlayRecordBloc extends Bloc<PlayRecordEvent, PlayState> {
   }
 
   Stream<PlayState> _mapTickToState(TickEvent e) async* {
-    yield e.note != 0 ? Playing(e.note) : Stopped();
+    yield Playing(e.note);
   }
 
   @override

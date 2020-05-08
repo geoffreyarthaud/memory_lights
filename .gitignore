@@ -356,3 +356,5 @@ build/
 android/.settings/
 
 android/app/.settings/
+
+.flutter-plugins-dependencies
