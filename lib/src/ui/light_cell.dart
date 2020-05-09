@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_midi/flutter_midi.dart';
 import 'package:injectable/injectable.dart';
-
 import 'package:memory_lights/src/blocs/events.dart';
 import 'package:memory_lights/src/blocs/light_bloc.dart';
 import 'package:memory_lights/src/blocs/play_record_bloc.dart';

@@ -47,20 +47,39 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   GameState _onStart(StartEvent startEvent) {
-    if (startEvent.gameState == null) {
+    if (startEvent.gameState == null || startEvent.gameState.status == GameStatus.setup) {
       if (_checkState(startEvent, [GameStatus.setup])) {
         _gameState = _gameState.copyWith(
           status: GameStatus.listen,
-          record: recordProvider.get(_gameState.level + 2, _gameState.nbCells)
+          record: _gameState.record.isEmpty ? recordProvider.get(_gameState.level + 2, _gameState.nbCells) : _gameState.record
         );
-        playRecordSubscription = playRecordBloc.listen(onPlayRecord);
-        playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
+        _startListen();
       }
     } else {
-      // TODO : check GameState correctness
-      return startEvent.gameState;
+      _gameState = startEvent.gameState;
+      switch(_gameState.status) {
+        case GameStatus.listen:
+          _startListen();
+          break;
+        case GameStatus.reproduce:  
+          break;
+        case GameStatus.win:
+          // TODO: Handle this case.
+          break;
+        case GameStatus.loose:
+          // TODO: Handle this case.
+          break;
+        case GameStatus.setup:
+        default:
+          throw FormatException("Invalid status");
+      }
     }
     return _gameState;
+  }
+
+  void _startListen() {
+        playRecordSubscription = playRecordBloc.listen(_onPlayRecord);
+        playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
   }
 
   GameState _onHumanPlay(HumanPlayEvent humanPlayEvent) {
@@ -85,7 +104,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
-  void onPlayRecord(PlayState ps) {
+  void _onPlayRecord(PlayState ps) {
     if (!detectPlayRecordStop && ps is Playing) {
       detectPlayRecordStop = true;
     } else if (detectPlayRecordStop && ps is Stopped) {
@@ -93,6 +112,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
       add(GameEvent.humanPlayEvent());
     }
   }
+
+
 
 
 }

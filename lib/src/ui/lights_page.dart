@@ -77,11 +77,7 @@ class LightsPage extends StatelessWidget {
 
   Widget centerAction(GameState gameState) {
     switch (gameState.status) {
-      case GameStatus.setup:
-        return RaisedButton(
-            onPressed: () => gameEngineBloc.add(GameEvent.startEvent()),
-            color: Colors.purple,
-            child: const Text('START', style: TextStyle(fontSize: 20)));
+      
       case GameStatus.listen:
         return Center(
             child: Text('LOOK...',
@@ -98,6 +94,12 @@ class LightsPage extends StatelessWidget {
         return Center(
             child: Text('TRY AGAIN...',
                 textAlign: TextAlign.center, style: TextStyle(fontSize: 20)));
+      case GameStatus.setup:
+      default:
+        return RaisedButton(
+            onPressed: () => gameEngineBloc.add(GameEvent.startEvent()),
+            color: Colors.purple,
+            child: const Text('START', style: TextStyle(fontSize: 20)));
     }
   }
 
