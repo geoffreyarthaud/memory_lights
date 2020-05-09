@@ -21,6 +21,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   bool detectPlayRecordStop = false;
 
+  int indexHumanPlay = 0;
+
   final RecordProvider recordProvider;
 
   final PlayRecordBloc playRecordBloc;
@@ -28,6 +30,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   final LightBloc lightBloc;
 
   StreamSubscription<PlayState> playRecordSubscription;
+
+  StreamSubscription<int> lightSubscription;
 
   GameEngineBloc(this.recordProvider, this.playRecordBloc, this.lightBloc)
       : _gameState = GameState(
@@ -47,21 +51,24 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   GameState _onStart(StartEvent startEvent) {
-    if (startEvent.gameState == null || startEvent.gameState.status == GameStatus.setup) {
+    if (startEvent.gameState == null ||
+        startEvent.gameState.status == GameStatus.setup) {
       if (_checkState(startEvent, [GameStatus.setup])) {
         _gameState = _gameState.copyWith(
-          status: GameStatus.listen,
-          record: _gameState.record.isEmpty ? recordProvider.get(_gameState.level + 2, _gameState.nbCells) : _gameState.record
-        );
+            status: GameStatus.listen,
+            record: _gameState.record.isEmpty
+                ? recordProvider.get(_gameState.level + 2, _gameState.nbCells)
+                : _gameState.record);
         _startListen();
       }
     } else {
       _gameState = startEvent.gameState;
-      switch(_gameState.status) {
+      switch (_gameState.status) {
         case GameStatus.listen:
           _startListen();
           break;
-        case GameStatus.reproduce:  
+        case GameStatus.reproduce:
+          lightSubscription = lightBloc.listen(_onLightEvent);
           break;
         case GameStatus.win:
           // TODO: Handle this case.
@@ -78,17 +85,17 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _startListen() {
-        playRecordSubscription = playRecordBloc.listen(_onPlayRecord);
-        playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
+    playRecordSubscription = playRecordBloc.listen(_onPlayRecord);
+    playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
   }
 
   GameState _onHumanPlay(HumanPlayEvent humanPlayEvent) {
-    // TODO
+    lightSubscription = lightBloc.listen(_onLightEvent);
     return _gameState.copyWith(status: GameStatus.reproduce);
   }
 
   GameState _onHumanError(HumanErrorEvent humanErrorEvent) {
-    return _gameState;
+    return _gameState.copyWith(status: GameStatus.loose);
   }
 
   GameState _onHumanCorrect(HumanCorrectEvent humanCorrectEvent) {
@@ -96,10 +103,11 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   bool _checkState(AbstractEvent gameEvent, List<GameStatus> statusList) {
-    if(statusList.contains(_gameState.status)) {
+    if (statusList.contains(_gameState.status)) {
       return true;
     } else {
-      logger.w("Invalid event $gameEvent from current status ${_gameState.status}");
+      logger.w(
+          "Invalid event $gameEvent from current status ${_gameState.status}");
       return false;
     }
   }
@@ -113,7 +121,15 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     }
   }
 
-
-
-
+  void _onLightEvent(int lightId) {
+    if (lightId != _gameState.record[indexHumanPlay]) {
+      add(GameEvent.humanErrorEvent());
+    }
+    indexHumanPlay++;
+    if (indexHumanPlay >= _gameState.record.length) {
+      indexHumanPlay = 0;
+      lightSubscription.cancel();
+      add(GameEvent.humanCorrectEvent());
+    }
+  }
 }
