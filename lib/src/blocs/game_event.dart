@@ -43,4 +43,9 @@ class GameEvent extends
   factory GameEvent.humanCorrectEvent()
     => GameEvent._(_factory.fourth(HumanCorrectEvent()));
 
+  @override
+  String toString() {
+    return join((e) => e.toString(), (e) => e.toString(), (e) => e.toString(), (e) => e.toString());
+  }
+
 }

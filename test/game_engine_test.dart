@@ -1,4 +1,4 @@
-//@Timeout(const Duration(seconds: 2))
+@Timeout(const Duration(seconds: 2))
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
@@ -25,7 +25,7 @@ void main() {
   MockPlayRecordBloc mockPlayRecordBloc;
   MockLightBloc mockLightBloc;
 
-  final GameState expectedInitial = GameState(nbCells: 4, level: 1, score: 0, record: [], status: GameStatus.setup);
+  final GameState expectedInitial = GameState(nbCells: 4, level: 1, lifes: 3, score: 0, record: [], status: GameStatus.setup);
 
   setUp(() {
     mockRecordProvider = MockRecordProvider();
@@ -114,7 +114,7 @@ void main() {
 
   test('When human plays and make mistake, then a loose event is emitted', () {
     // GIVEN
-    mockStates(mockLightBloc, [1, 2, 3, 4]);
+    mockStates(mockLightBloc, [-1, 1, 0, 2, 0, 3, 0, 4]);
     var loadedState = GameState(
             nbCells: 4,
             level: 1,
@@ -128,6 +128,26 @@ void main() {
     // THEN
     expect(gameEngine, emitsInOrder(
       [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.loose)]
+    ));
+    
+  });
+
+    test('When human plays without error, then a win event is emitted', () {
+    // GIVEN
+    mockStates(mockLightBloc, [-1, 2, 0, 4, 0, 1, 0, 3]);
+    var loadedState = GameState(
+            nbCells: 4,
+            level: 1,
+            score: 0,
+            record: [2,4,1,3],
+            status: GameStatus.reproduce);
+
+    // WHEN
+    gameEngine.add(GameEvent.startEvent(gameState: loadedState));
+    
+    // THEN
+    expect(gameEngine, emitsInOrder(
+      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.win)]
     ));
     
   });

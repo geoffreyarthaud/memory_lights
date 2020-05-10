@@ -1,9 +1,12 @@
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 
 class GameState {
   final int nbCells;
   final int level;
+  final int lifes;
   final int score;
   final int nbTry;
   final GameStatus status;
@@ -11,6 +14,7 @@ class GameState {
   GameState({
     this.nbCells,
     this.level,
+    this.lifes,
     this.score,
     this.nbTry,
     this.status,
@@ -20,6 +24,7 @@ class GameState {
   GameState copyWith({
     int nbCells,
     int level,
+    int lifes,
     int score,
     int nbTry,
     GameStatus status,
@@ -28,6 +33,7 @@ class GameState {
     return GameState(
       nbCells: nbCells ?? this.nbCells,
       level: level ?? this.level,
+      lifes: lifes ?? this.lifes,
       score: score ?? this.score,
       nbTry: nbTry ?? this.nbTry,
       status: status ?? this.status,
@@ -37,7 +43,7 @@ class GameState {
 
   @override
   String toString() {
-    return 'GameState(nbCells: $nbCells, level: $level, score: $score, nbTry: $nbTry, status: $status, record: $record)';
+    return 'GameState(nbCells: $nbCells, level: $level, lifes: $lifes, score: $score, nbTry: $nbTry, status: $status, record: $record)';
   }
 
   @override
@@ -47,6 +53,7 @@ class GameState {
     return o is GameState &&
       o.nbCells == nbCells &&
       o.level == level &&
+      o.lifes == lifes &&
       o.score == score &&
       o.nbTry == nbTry &&
       o.status == status &&
@@ -57,11 +64,42 @@ class GameState {
   int get hashCode {
     return nbCells.hashCode ^
       level.hashCode ^
+      lifes.hashCode ^
       score.hashCode ^
       nbTry.hashCode ^
       status.hashCode ^
       record.hashCode;
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'nbCells': nbCells,
+      'level': level,
+      'lifes': lifes,
+      'score': score,
+      'nbTry': nbTry,
+      'status': status,
+      'record': record,
+    };
+  }
+
+  static GameState fromMap(Map<String, dynamic> map) {
+    if (map == null) return null;
+  
+    return GameState(
+      nbCells: map['nbCells'],
+      level: map['level'],
+      lifes: map['lifes'],
+      score: map['score'],
+      nbTry: map['nbTry'],
+      status: map['status'],
+      record: List<int>.from(map['record']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  static GameState fromJson(String source) => fromMap(json.decode(source));
 }
 
 enum GameStatus {

@@ -79,21 +79,13 @@ class LightsPage extends StatelessWidget {
     switch (gameState.status) {
       
       case GameStatus.listen:
-        return Center(
-            child: Text('LOOK...',
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 20)));
+        return _centerText('LOOK...', Colors.black);
       case GameStatus.reproduce:
-        return Center(
-            child: Text('PLAY !',
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 20)));
+        return _centerText('PLAY !', Colors.black);
       case GameStatus.win:
-        return Center(
-            child: Text('YOU WIN !',
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 20)));
+        return _centerText('YOU WIN !', Colors.green);
       case GameStatus.loose:
-        return Center(
-            child: Text('TRY AGAIN...',
-                textAlign: TextAlign.center, style: TextStyle(fontSize: 20)));
+        return _centerText('TRY AGAIN ...', Colors.red);
       case GameStatus.setup:
       default:
         return RaisedButton(
@@ -104,6 +96,13 @@ class LightsPage extends StatelessWidget {
   }
 
   bool _isTappable(GameState state) {
-    return state.status == GameStatus.reproduce;
+    return state.status != GameStatus.listen;
+  }
+
+  Widget _centerText(String text, Color backgroundColor) {
+    return Expanded(
+            child: Container(padding: const EdgeInsets.all(8), color: backgroundColor, 
+              child: Center(
+                child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 20)))));
   }
 }

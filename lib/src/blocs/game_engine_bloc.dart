@@ -37,6 +37,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
       : _gameState = GameState(
             nbCells: 4,
             level: 1,
+            lifes: 3,
             score: 0,
             record: [],
             status: GameStatus.setup),
@@ -99,7 +100,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   GameState _onHumanCorrect(HumanCorrectEvent humanCorrectEvent) {
-    return _gameState;
+    return _gameState.copyWith(status: GameStatus.win);
   }
 
   bool _checkState(AbstractEvent gameEvent, List<GameStatus> statusList) {
@@ -122,7 +123,12 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _onLightEvent(int lightId) {
+    if (lightId <= 0) {
+      return;
+    }
     if (lightId != _gameState.record[indexHumanPlay]) {
+      indexHumanPlay = 0;
+      lightSubscription.cancel();
       add(GameEvent.humanErrorEvent());
     }
     indexHumanPlay++;

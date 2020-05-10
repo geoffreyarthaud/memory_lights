@@ -28,4 +28,9 @@ class GestureEvent {
   factory GestureEvent.offEvent() => _offEvent;
 
   GestureEvent._internal(this.type);
+
+  @override
+  String toString() {
+    return type.join((e) => e.toString(), (e) => e.toString());
+  }
 }

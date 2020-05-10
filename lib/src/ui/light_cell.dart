@@ -40,8 +40,6 @@ class LightCell extends StatelessWidget {
   }
 
   Widget _buildTappable(BuildContext context) {
-    //ignore: close_sinks
-    final LightBloc lightBloc = BlocProvider.of<LightBloc>(context);
 
     return GestureDetector(onTapDown: (TapDownDetails details) {
       lightBloc.add(GestureEvent.onEvent(id));

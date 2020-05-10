@@ -51,4 +51,9 @@ class PlayRecordEvent extends
   factory PlayRecordEvent.tick(int note)
     => PlayRecordEvent._(_factory.fifth(TickEvent(note)));
 
+  @override
+  String toString() {
+    return join((e) => e.toString(), (e) => e.toString(), (e) => e.toString(), (e) => e.toString(), (e) => e.toString());
+  }
+
 }

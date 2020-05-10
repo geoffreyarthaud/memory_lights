@@ -8,7 +8,15 @@ final Logger logger = Logger();
 class GameBlocDelegate extends BlocDelegate {
   @override
   void onEvent(Bloc bloc, Object event) {
-    logger.i("Bloc " + bloc.toString() + " with Object " + event.toString());
+    print(event.toString() + " from " + bloc.toString());
     super.onEvent(bloc, event);
   }
+
+  @override
+  void onTransition(Bloc bloc, Transition transition) {
+    print(transition.nextState.toString() + " from " + bloc.toString());
+    super.onTransition(bloc, transition);
+  }
+
+  
 }
