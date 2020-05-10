@@ -62,10 +62,10 @@ class LightsPage extends StatelessWidget {
                 )),
                 Row(children: [
                   Expanded(
-                      child: const Text('Score : 9999',
+                      child: Text('Lifes : ' + state.lifes.toString(),
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 15))),
-                  const Text('Level : 99',
+                  Text('Level : ' + state.level.toString(),
                       textAlign: TextAlign.right,
                       style: TextStyle(fontSize: 15)),
                 ])
@@ -100,9 +100,8 @@ class LightsPage extends StatelessWidget {
   }
 
   Widget _centerText(String text, Color backgroundColor) {
-    return Expanded(
-            child: Container(padding: const EdgeInsets.all(8), color: backgroundColor, 
+    return Container(padding: const EdgeInsets.all(8), color: backgroundColor, 
               child: Center(
-                child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 20)))));
+                child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 20))));
   }
 }

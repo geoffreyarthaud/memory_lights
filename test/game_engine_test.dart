@@ -60,7 +60,7 @@ void main() {
   test('When game starts, then a record is correctly filled', () {
     // GIVEN
     List<int> expectedRecord = [2,4,1,3];
-    when(mockRecordProvider.get(any, any)).thenReturn(expectedRecord);
+    when(mockRecordProvider.get(any, any, from: anyNamed("from"))).thenReturn(expectedRecord);
 
     // WHEN
     gameEngine.add(GameEvent.startEvent());
@@ -77,7 +77,7 @@ void main() {
   test('When game starts, then a a play event is emitted', () {
     // GIVEN
     List<int> expectedRecord = [2,4,1,3];
-    when(mockRecordProvider.get(any, any)).thenReturn(expectedRecord);
+    when(mockRecordProvider.get(any, any, from: anyNamed("from"))).thenReturn(expectedRecord);
 
     // WHEN
     gameEngine.add(GameEvent.startEvent());
@@ -115,10 +115,7 @@ void main() {
   test('When human plays and make mistake, then a loose event is emitted', () {
     // GIVEN
     mockStates(mockLightBloc, [-1, 1, 0, 2, 0, 3, 0, 4]);
-    var loadedState = GameState(
-            nbCells: 4,
-            level: 1,
-            score: 0,
+    var loadedState = expectedInitial.copyWith(
             record: [2,4,1,3],
             status: GameStatus.reproduce);
 
@@ -127,7 +124,7 @@ void main() {
     
     // THEN
     expect(gameEngine, emitsInOrder(
-      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.loose)]
+      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.loose, lifes: loadedState.lifes - 1)]
     ));
     
   });
@@ -135,10 +132,7 @@ void main() {
     test('When human plays without error, then a win event is emitted', () {
     // GIVEN
     mockStates(mockLightBloc, [-1, 2, 0, 4, 0, 1, 0, 3]);
-    var loadedState = GameState(
-            nbCells: 4,
-            level: 1,
-            score: 0,
+    var loadedState = expectedInitial.copyWith(
             record: [2,4,1,3],
             status: GameStatus.reproduce);
 
@@ -147,7 +141,7 @@ void main() {
     
     // THEN
     expect(gameEngine, emitsInOrder(
-      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.win)]
+      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.win, level: loadedState.level + 1)]
     ));
     
   });

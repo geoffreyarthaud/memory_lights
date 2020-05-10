@@ -54,14 +54,10 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   GameState _onStart(StartEvent startEvent) {
     if (startEvent.gameState == null ||
         startEvent.gameState.status == GameStatus.setup) {
-      if (_checkState(startEvent, [GameStatus.setup])) {
-        _gameState = _gameState.copyWith(
-            status: GameStatus.listen,
-            record: _gameState.record.isEmpty
-                ? recordProvider.get(_gameState.level + 2, _gameState.nbCells)
-                : _gameState.record);
-        _startListen();
-      }
+      _gameState = _gameState.copyWith(
+          status: GameStatus.listen,
+          record: recordProvider.get(_gameState.level + 2, _gameState.nbCells, from: _gameState.record));
+      _startListen();
     } else {
       _gameState = startEvent.gameState;
       switch (_gameState.status) {
@@ -72,10 +68,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
           lightSubscription = lightBloc.listen(_onLightEvent);
           break;
         case GameStatus.win:
-          // TODO: Handle this case.
           break;
         case GameStatus.loose:
-          // TODO: Handle this case.
           break;
         case GameStatus.setup:
         default:
@@ -86,31 +80,29 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   void _startListen() {
+    detectPlayRecordStop = false;
     playRecordSubscription = playRecordBloc.listen(_onPlayRecord);
     playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
   }
 
   GameState _onHumanPlay(HumanPlayEvent humanPlayEvent) {
+    indexHumanPlay = 0;
     lightSubscription = lightBloc.listen(_onLightEvent);
     return _gameState.copyWith(status: GameStatus.reproduce);
   }
 
   GameState _onHumanError(HumanErrorEvent humanErrorEvent) {
+    _gameState = _gameState.copyWith(
+        status: GameStatus.loose, lifes: _gameState.lifes - 1);
+    Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
     return _gameState.copyWith(status: GameStatus.loose);
   }
 
   GameState _onHumanCorrect(HumanCorrectEvent humanCorrectEvent) {
-    return _gameState.copyWith(status: GameStatus.win);
-  }
-
-  bool _checkState(AbstractEvent gameEvent, List<GameStatus> statusList) {
-    if (statusList.contains(_gameState.status)) {
-      return true;
-    } else {
-      logger.w(
-          "Invalid event $gameEvent from current status ${_gameState.status}");
-      return false;
-    }
+    _gameState = _gameState.copyWith(
+        status: GameStatus.win, level: _gameState.level + 1);
+    Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
+    return _gameState;
   }
 
   void _onPlayRecord(PlayState ps) {
@@ -127,13 +119,11 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
       return;
     }
     if (lightId != _gameState.record[indexHumanPlay]) {
-      indexHumanPlay = 0;
       lightSubscription.cancel();
       add(GameEvent.humanErrorEvent());
     }
     indexHumanPlay++;
     if (indexHumanPlay >= _gameState.record.length) {
-      indexHumanPlay = 0;
       lightSubscription.cancel();
       add(GameEvent.humanCorrectEvent());
     }

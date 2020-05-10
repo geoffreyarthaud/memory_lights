@@ -7,9 +7,10 @@ import 'package:quiver/check.dart';
 class RecordProvider {
   final random = Random();
 
-  List<int> get(int nbRecords, int nbCells) {
-    checkArgument(nbRecords > 0);
+  List<int> get(int nbRecords, int nbCells, {List<int> from}) {
+    List<int> initFrom = from ?? [];
+    checkArgument(nbRecords >= initFrom.length);
     checkArgument(nbCells > 0);
-    return List.generate(nbRecords, (_) => random.nextInt(nbCells) + 1);
+    return initFrom + List.generate(nbRecords - initFrom.length, (_) => random.nextInt(nbCells) + 1);
   }
 }
