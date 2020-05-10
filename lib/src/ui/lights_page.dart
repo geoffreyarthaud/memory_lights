@@ -62,7 +62,7 @@ class LightsPage extends StatelessWidget {
                 )),
                 Row(children: [
                   Expanded(
-                      child: Text('Lifes : ' + state.lifes.toString(),
+                      child: Text(state.lifes > 5 ? '❤️ x ' + state.lifes.toString() : '❤️'*state.lifes,
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 15))),
                   Text('Level : ' + state.level.toString(),
@@ -79,19 +79,19 @@ class LightsPage extends StatelessWidget {
     switch (gameState.status) {
       
       case GameStatus.listen:
-        return _centerText('LOOK...', Colors.black);
+        return _centerText('👀', Colors.black);
       case GameStatus.reproduce:
-        return _centerText('PLAY !', Colors.black);
+        return _centerText('👇', Colors.black);
       case GameStatus.win:
-        return _centerText('YOU WIN !', Colors.green);
+        return _centerText('😊', Colors.black);
       case GameStatus.loose:
-        return _centerText('TRY AGAIN ...', Colors.red);
+        return _centerText('💔', Colors.black);
       case GameStatus.setup:
       default:
         return RaisedButton(
             onPressed: () => gameEngineBloc.add(GameEvent.startEvent()),
             color: Colors.purple,
-            child: const Text('START', style: TextStyle(fontSize: 20)));
+            child: const Text('▶️', style: TextStyle(fontSize: 40)));
     }
   }
 
@@ -102,6 +102,6 @@ class LightsPage extends StatelessWidget {
   Widget _centerText(String text, Color backgroundColor) {
     return Container(padding: const EdgeInsets.all(8), color: backgroundColor, 
               child: Center(
-                child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 20))));
+                child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 40))));
   }
 }

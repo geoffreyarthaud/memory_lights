@@ -29,18 +29,20 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   final LightBloc lightBloc;
 
-  StreamSubscription<PlayState> playRecordSubscription;
-
-  StreamSubscription<int> lightSubscription;
-
-  GameEngineBloc(this.recordProvider, this.playRecordBloc, this.lightBloc)
-      : _gameState = GameState(
+  static final GameState initialGameState = GameState(
             nbCells: 4,
             level: 1,
             lifes: 3,
             score: 0,
             record: [],
-            status: GameStatus.setup),
+            status: GameStatus.setup);
+
+  StreamSubscription<PlayState> playRecordSubscription;
+
+  StreamSubscription<int> lightSubscription;
+
+  GameEngineBloc(this.recordProvider, this.playRecordBloc, this.lightBloc)
+      : _gameState = initialGameState,
         super();
 
   @override
@@ -48,7 +50,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   @override
   Stream<GameState> mapEventToState(event) async* {
-    yield event.join(_onStart, _onHumanPlay, _onHumanError, _onHumanCorrect);
+    yield event.join(_onStart, _onHumanPlay, _onHumanError, _onHumanCorrect, _onEnded);
   }
 
   GameState _onStart(StartEvent startEvent) {
@@ -94,7 +96,12 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   GameState _onHumanError(HumanErrorEvent humanErrorEvent) {
     _gameState = _gameState.copyWith(
         status: GameStatus.loose, lifes: _gameState.lifes - 1);
-    Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
+    if (_gameState.lifes > 0) {
+      Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
+    } else {
+      Timer(Duration(seconds: 3), () => add(GameEvent.endEvent()));
+    }
+    
     return _gameState.copyWith(status: GameStatus.loose);
   }
 
@@ -102,6 +109,11 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     _gameState = _gameState.copyWith(
         status: GameStatus.win, level: _gameState.level + 1);
     Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
+    return _gameState;
+  }
+
+  GameState _onEnded(EndEvent endEvent) {
+    _gameState = initialGameState;
     return _gameState;
   }
 
