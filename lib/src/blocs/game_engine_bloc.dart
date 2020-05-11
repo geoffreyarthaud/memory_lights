@@ -36,6 +36,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
       level: 1,
       lifes: 3,
       score: 0,
+      lastScore: 0,
+      lastLevel: 0,
       record: [],
       status: GameStatus.setup);
 
@@ -129,7 +131,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     lightSubscription?.cancel();
     playRecordSubscription?.cancel();
     playRecordBloc.add(PlayRecordEvent.stop());
-    _gameState = initialGameState;
+    _gameState = initialGameState.copyWith(lastLevel: _gameState.level, lastScore: _gameState.score);
     return _gameState;
   }
 

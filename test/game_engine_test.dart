@@ -147,6 +147,33 @@ void main() {
   testScoreAugmented(456, 5);
   testScoreAugmented(0, 3);
   testScoreAugmented(1203, 15);
+
+  test('When game is ended, score and level are backed up', () {
+    // GIVEN
+    mockStates(
+        mockPlayRecordBloc, [Paused(), Playing(1), Playing(0), Stopped()]);
+    var loadedState = GameState(
+        nbCells: 4,
+        level: 5,
+        score: 543,
+        record: [2, 4, 1, 3],
+        status: GameStatus.listen);
+
+    // WHEN
+    gameEngine.add(GameEvent.startEvent(gameState: loadedState));
+    Timer(Duration(milliseconds: 100), () => gameEngine.add(GameEvent.endEvent()));
+
+    // THEN
+    expect(
+        gameEngine,
+        emitsInOrder([
+          GameEngineBloc.initialGameState,
+          loadedState,
+          predicate((s) => s.status == GameStatus.reproduce),
+          predicate((s) => s.lastLevel == 5 && s.lastScore == 543)
+        ]));
+
+  });
   
 }
 

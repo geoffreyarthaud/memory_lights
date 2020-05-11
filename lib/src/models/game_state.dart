@@ -10,6 +10,8 @@ class GameState {
   final int score;
   final GameStatus status;
   final List<int> record;
+  final int lastScore;
+  final int lastLevel;
   GameState({
     this.nbCells,
     this.level,
@@ -17,6 +19,8 @@ class GameState {
     this.score,
     this.status,
     this.record,
+    this.lastScore,
+    this.lastLevel,
   });
 
   GameState copyWith({
@@ -26,6 +30,8 @@ class GameState {
     int score,
     GameStatus status,
     List<int> record,
+    int lastScore,
+    int lastLevel,
   }) {
     return GameState(
       nbCells: nbCells ?? this.nbCells,
@@ -34,12 +40,14 @@ class GameState {
       score: score ?? this.score,
       status: status ?? this.status,
       record: record ?? this.record,
+      lastScore: lastScore ?? this.lastScore,
+      lastLevel: lastLevel ?? this.lastLevel,
     );
   }
 
   @override
   String toString() {
-    return 'GameState(nbCells: $nbCells, level: $level, lifes: $lifes, score: $score, status: $status, record: $record)';
+    return 'GameState(nbCells: $nbCells, level: $level, lifes: $lifes, score: $score, status: $status, record: $record, lastScore: $lastScore, lastLevel: $lastLevel)';
   }
 
   @override
@@ -52,7 +60,9 @@ class GameState {
       o.lifes == lifes &&
       o.score == score &&
       o.status == status &&
-      listEquals(o.record, record);
+      listEquals(o.record, record) &&
+      o.lastScore == lastScore &&
+      o.lastLevel == lastLevel;
   }
 
   @override
@@ -62,7 +72,9 @@ class GameState {
       lifes.hashCode ^
       score.hashCode ^
       status.hashCode ^
-      record.hashCode;
+      record.hashCode ^
+      lastScore.hashCode ^
+      lastLevel.hashCode;
   }
 
   Map<String, dynamic> toMap() {
@@ -73,6 +85,8 @@ class GameState {
       'score': score,
       'status': status,
       'record': record,
+      'lastScore': lastScore,
+      'lastLevel': lastLevel,
     };
   }
 
@@ -86,6 +100,8 @@ class GameState {
       score: map['score'],
       status: map['status'],
       record: List<int>.from(map['record']),
+      lastScore: map['lastScore'],
+      lastLevel: map['lastLevel'],
     );
   }
 

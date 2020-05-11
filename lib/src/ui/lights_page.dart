@@ -10,7 +10,6 @@ import 'light_cell.dart';
 
 @singleton
 class LightsPage extends StatelessWidget {
-
   final GameEngineBloc gameEngineBloc;
 
   LightsPage(this.gameEngineBloc)
@@ -25,17 +24,15 @@ class LightsPage extends StatelessWidget {
         bloc: gameEngineBloc,
         builder: (context, state) {
           return Scaffold(
-              appBar: AppBar(
-                title: Text(title),
-                actions: <Widget>[
-                  IconButton(
-                    icon: const Icon(Icons.refresh),
-                    tooltip: 'Restart',
-                    onPressed: () {
-                      gameEngineBloc.add(GameEvent.endEvent());
-                    },
-                  )]
-              ),
+              appBar: AppBar(title: Text(title), actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  tooltip: 'Restart',
+                  onPressed: () {
+                    gameEngineBloc.add(GameEvent.endEvent());
+                  },
+                )
+              ]),
               body: Column(children: <Widget>[
                 Expanded(
                     child: GridView.count(
@@ -68,23 +65,41 @@ class LightsPage extends StatelessWidget {
                     _emptyCell(),
                   ],
                 )),
-                Row(children: [
-                  Expanded(
-                      child: Text(_getLeftFooterText(state),
-                          textAlign: TextAlign.left,
-                          style: TextStyle(fontSize: 15))),
-                  Text(_getRightFooterTest(state),
-                      textAlign: TextAlign.right,
-                      style: TextStyle(fontSize: 15)),
-                ])
+                state.status == GameStatus.setup ? getStartFooter(state) : getGameFooter(state)
               ]));
         });
   }
 
   Container _emptyCell() => Container(padding: const EdgeInsets.all(8));
 
+  Widget getGameFooter(GameState state) {
+    return Row(children: [
+      Expanded(
+          child: Text(_getLeftFooterText(state),
+              textAlign: TextAlign.left, style: TextStyle(fontSize: 15))),
+      Text(_getRightFooterTest(state),
+          textAlign: TextAlign.right, style: TextStyle(fontSize: 15)),
+    ]);
+  }
+
+  Widget getStartFooter(GameState state) {
+    return Row(children: [
+      Center(
+          child: Text(_getStartFooterText(state), style: TextStyle(fontSize: 40)))
+    ]);
+  }
+
+  String _getStartFooterText(GameState state) {
+    return state.lastLevel > 0 ? "SCORE : " + state.lastScore.toString() + "\nLEVEL : " + state.lastLevel.toString() : "";
+  }
+
   String _getLeftFooterText(GameState state) {
-    return 'Level : ' + state.level.toString() + ' ' + (state.lifes > 5 ? '❤️ x ' + state.lifes.toString() : '❤️'*state.lifes);
+    return 'Level : ' +
+        state.level.toString() +
+        ' ' +
+        (state.lifes > 5
+            ? '❤️ x ' + state.lifes.toString()
+            : '❤️' * state.lifes);
   }
 
   String _getRightFooterTest(GameState state) {
@@ -93,7 +108,6 @@ class LightsPage extends StatelessWidget {
 
   Widget centerAction(GameState gameState) {
     switch (gameState.status) {
-      
       case GameStatus.listen:
         return _centerText('👀', Colors.black);
       case GameStatus.reproduce:
@@ -116,8 +130,10 @@ class LightsPage extends StatelessWidget {
   }
 
   Widget _centerText(String text, Color backgroundColor) {
-    return Container(padding: const EdgeInsets.all(8), 
-              child: Center(
-                child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 40))));
+    return Container(
+        padding: const EdgeInsets.all(8),
+        child: Center(
+            child: Text(text,
+                textAlign: TextAlign.center, style: TextStyle(fontSize: 40))));
   }
 }
