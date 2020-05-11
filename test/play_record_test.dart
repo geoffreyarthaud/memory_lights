@@ -8,7 +8,6 @@ void main() {
 
   setUp(() {
     playRecordBloc = PlayRecordBloc();
-    playRecordBloc.duration = 10;
   });
 
   test('When play event of one note 42, then emits this note after initialization', () {
@@ -18,7 +17,7 @@ void main() {
     ));
 
     // WHEN
-    playRecordBloc.add(PlayRecordEvent.play([42]));
+    playRecordBloc.add(PlayRecordEvent.play([42], 10));
   });
 
     test('When play event of four note 4,2,3,5, then emits theses notes after initialization', () {
@@ -28,6 +27,6 @@ void main() {
     ));
 
     // WHEN
-    playRecordBloc.add(PlayRecordEvent.play([4,2,3,5]));
+    playRecordBloc.add(PlayRecordEvent.play([4,2,3,5], 10));
   });
 }

@@ -14,24 +14,25 @@ import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 class MockRecordProvider extends Mock implements RecordProvider {}
+
 class MockPlayRecordBloc extends Mock implements PlayRecordBloc {}
+
 class MockLightBloc extends Mock implements LightBloc {}
 
 GameEngineBloc gameEngine;
 
-void main() {
-  
-  MockRecordProvider mockRecordProvider; 
-  MockPlayRecordBloc mockPlayRecordBloc;
-  MockLightBloc mockLightBloc;
+MockRecordProvider mockRecordProvider;
+MockPlayRecordBloc mockPlayRecordBloc;
+MockLightBloc mockLightBloc;
 
-  final GameState expectedInitial = GameState(nbCells: 4, level: 1, lifes: 3, score: 0, record: [], status: GameStatus.setup);
+void main() {
 
   setUp(() {
     mockRecordProvider = MockRecordProvider();
     mockPlayRecordBloc = MockPlayRecordBloc();
     mockLightBloc = MockLightBloc();
-    gameEngine = GameEngineBloc(mockRecordProvider, mockPlayRecordBloc, mockLightBloc);
+    gameEngine =
+        GameEngineBloc(mockRecordProvider, mockPlayRecordBloc, mockLightBloc);
   });
 
   tearDown(() {
@@ -41,26 +42,27 @@ void main() {
   });
 
   test('Game should start with correct state', () {
-
-    expect(gameEngine.initialState, expectedInitial);
+    expect(gameEngine.initialState, GameEngineBloc.initialGameState);
   });
 
   test('When game starts, then status is setup and then listen', () {
-
     // WHEN
     gameEngine.add(GameEvent.startEvent());
 
     // THEN
-    expectLater(gameEngine, emitsInOrder(
-      [expectedInitial, expectedInitial.copyWith(status: GameStatus.listen)]
-    ));
-
+    expectLater(
+        gameEngine,
+        emitsInOrder([
+          GameEngineBloc.initialGameState,
+          GameEngineBloc.initialGameState.copyWith(status: GameStatus.listen)
+        ]));
   });
 
   test('When game starts, then a record is correctly filled', () {
     // GIVEN
-    List<int> expectedRecord = [2,4,1,3];
-    when(mockRecordProvider.get(any, any, from: anyNamed("from"))).thenReturn(expectedRecord);
+    List<int> expectedRecord = [2, 4, 1, 3];
+    when(mockRecordProvider.get(any, any, from: anyNamed("from")))
+        .thenReturn(expectedRecord);
 
     // WHEN
     gameEngine.add(GameEvent.startEvent());
@@ -71,13 +73,13 @@ void main() {
         expect(gameState.record, containsAllInOrder(expectedRecord));
       }
     }, count: 2));
-
   });
 
   test('When game starts, then a a play event is emitted', () {
     // GIVEN
-    List<int> expectedRecord = [2,4,1,3];
-    when(mockRecordProvider.get(any, any, from: anyNamed("from"))).thenReturn(expectedRecord);
+    List<int> expectedRecord = [2, 4, 1, 3];
+    when(mockRecordProvider.get(any, any, from: anyNamed("from")))
+        .thenReturn(expectedRecord);
 
     // WHEN
     gameEngine.add(GameEvent.startEvent());
@@ -85,73 +87,90 @@ void main() {
     // THEN
     gameEngine.listen((gameState) {
       if (gameState.status == GameStatus.listen) {
-        verify(mockPlayRecordBloc.add(PlayRecordEvent.play(expectedRecord))).called(1);
+        verify(mockPlayRecordBloc
+                .add(PlayRecordEvent.play(expectedRecord, 1000)))
+            .called(1);
       }
     });
-
   });
 
-  test('When Record has finished playing, then game state becomes reproduce', () {
+  test('When Record has finished playing, then game state becomes reproduce',
+      () {
     // GIVEN
-    mockStates(mockPlayRecordBloc, [Paused(), Playing(1), Playing(0), Stopped()]);
+    mockStates(
+        mockPlayRecordBloc, [Paused(), Playing(1), Playing(0), Stopped()]);
     var loadedState = GameState(
-            nbCells: 4,
-            level: 1,
-            score: 0,
-            record: [2,4,1,3],
-            status: GameStatus.listen);
-        
+        nbCells: 4,
+        level: 1,
+        score: 0,
+        record: [2, 4, 1, 3],
+        status: GameStatus.listen);
+
     // WHEN
     gameEngine.add(GameEvent.startEvent(gameState: loadedState));
 
     // THEN
-    expect(gameEngine, emitsInOrder(
-      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.reproduce)]
-    ));
-
-
+    expect(
+        gameEngine,
+        emitsInOrder([
+          GameEngineBloc.initialGameState,
+          loadedState,
+          loadedState.copyWith(status: GameStatus.reproduce)
+        ]));
   });
 
-  test('When human plays and make mistake, then a loose event is emitted', () {
-    // GIVEN
-    mockStates(mockLightBloc, [-1, 1, 0, 2, 0, 3, 0, 4]);
-    var loadedState = expectedInitial.copyWith(
-            record: [2,4,1,3],
-            status: GameStatus.reproduce);
+  testMistakes([2, 4, 1, 3], [-1, 1, 0, 2, 0, 3, 0, 4]);
+  testMistakes([2, 4, 1, 3], [-1, 2, 0, 2, 0, 1, 0, 3]);
+  testMistakes([2, 4, 1, 3], [-1, 2, 0, 4, 0, 1, 0, 4]);
 
-    // WHEN
-    gameEngine.add(GameEvent.startEvent(gameState: loadedState));
-    
-    // THEN
-    expect(gameEngine, emitsInOrder(
-      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.loose, lifes: loadedState.lifes - 1)]
-    ));
-    
-  });
-
-    test('When human plays without error, then a win event is emitted', () {
+  test('When human plays without error, then a win event is emitted', () {
     // GIVEN
     mockStates(mockLightBloc, [-1, 2, 0, 4, 0, 1, 0, 3]);
-    var loadedState = expectedInitial.copyWith(
-            record: [2,4,1,3],
-            status: GameStatus.reproduce);
+    var loadedState = GameEngineBloc.initialGameState
+        .copyWith(record: [2, 4, 1, 3], status: GameStatus.reproduce);
 
     // WHEN
     gameEngine.add(GameEvent.startEvent(gameState: loadedState));
-    
-    // THEN
-    expect(gameEngine, emitsInOrder(
-      [expectedInitial, loadedState, loadedState.copyWith(status: GameStatus.win, level: loadedState.level + 1)]
-    ));
-    
-  });
 
+    // THEN
+    expect(
+        gameEngine,
+        emitsInOrder([
+          GameEngineBloc.initialGameState,
+          loadedState,
+          loadedState.copyWith(
+              status: GameStatus.win, level: loadedState.level + 1)
+        ]));
+  });
 }
 
 StreamSubscription<T> mockStream<T>(Invocation invocation, List<T> fromList) {
-  return Stream.fromIterable(fromList).listen(invocation.positionalArguments[0]);
+  return Stream.fromIterable(fromList)
+      .listen(invocation.positionalArguments[0]);
 }
 
-void mockStates<S>(Bloc<dynamic,S> bloc, List<S> states) {
+void mockStates<S>(Bloc<dynamic, S> bloc, List<S> states) {
   when(bloc.listen(any)).thenAnswer((i) => mockStream(i, states));
+}
+
+void testMistakes(List<int> record, List<int> humanPlay) {
+  test('When human should play' + record.toString() +' and play ' + humanPlay.toString() + ', then a loose event is emitted', () {
+    // GIVEN
+    mockStates(mockLightBloc, humanPlay);
+    var loadedState = GameEngineBloc.initialGameState
+        .copyWith(record: record, status: GameStatus.reproduce);
+
+    // WHEN
+    gameEngine.add(GameEvent.startEvent(gameState: loadedState));
+
+    // THEN
+    expect(
+        gameEngine,
+        emitsInOrder([
+          GameEngineBloc.initialGameState,
+          loadedState,
+          loadedState.copyWith(
+              status: GameStatus.loose, lifes: loadedState.lifes - 1)
+        ]));
+  });
 }

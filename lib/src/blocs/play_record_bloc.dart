@@ -13,7 +13,6 @@ final Logger logger = Logger();
 
 @singleton
 class PlayRecordBloc extends Bloc<PlayRecordEvent, PlayState> {
-  int duration = 1000;
 
   @override
   PlayState get initialState => Stopped();
@@ -35,7 +34,7 @@ class PlayRecordBloc extends Bloc<PlayRecordEvent, PlayState> {
     yield Paused();
     _tickerSubscription?.cancel();
     _tickerSubscription = IntTicker
-      .tick(e.record, duration)
+      .tick(e.record, e.duration)
       .listen((note) => add(PlayRecordEvent.tick(note)),
       onDone: () {
         add(PlayRecordEvent.stop());

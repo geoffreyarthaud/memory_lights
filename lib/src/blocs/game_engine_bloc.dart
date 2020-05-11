@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:injectable/injectable.dart';
@@ -10,7 +11,6 @@ import 'package:memory_lights/src/blocs/play_state.dart';
 import 'package:memory_lights/src/models/game_state.dart';
 import 'package:memory_lights/src/utils/record_provider.dart';
 
-import 'events.dart';
 import 'game_event.dart';
 
 final logger = Logger();
@@ -29,13 +29,15 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   final LightBloc lightBloc;
 
+  static final List<int> durations = [1000, 707, 500, 354, 250];
+
   static final GameState initialGameState = GameState(
-            nbCells: 4,
-            level: 1,
-            lifes: 3,
-            score: 0,
-            record: [],
-            status: GameStatus.setup);
+      nbCells: 4,
+      level: 1,
+      lifes: 3,
+      score: 0,
+      record: [],
+      status: GameStatus.setup);
 
   StreamSubscription<PlayState> playRecordSubscription;
 
@@ -50,7 +52,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   @override
   Stream<GameState> mapEventToState(event) async* {
-    yield event.join(_onStart, _onHumanPlay, _onHumanError, _onHumanCorrect, _onEnded);
+    yield event.join(
+        _onStart, _onHumanPlay, _onHumanError, _onHumanCorrect, _onEnded);
   }
 
   GameState _onStart(StartEvent startEvent) {
@@ -58,7 +61,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
         startEvent.gameState.status == GameStatus.setup) {
       _gameState = _gameState.copyWith(
           status: GameStatus.listen,
-          record: recordProvider.get(_gameState.level + 2, _gameState.nbCells, from: _gameState.record));
+          record: recordProvider.get(_gameState.level + 2, _gameState.nbCells,
+              from: _gameState.record));
       _startListen();
     } else {
       _gameState = startEvent.gameState;
@@ -84,7 +88,8 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   void _startListen() {
     detectPlayRecordStop = false;
     playRecordSubscription = playRecordBloc.listen(_onPlayRecord);
-    playRecordBloc.add(PlayRecordEvent.play(_gameState.record));
+    playRecordBloc.add(PlayRecordEvent.play(_gameState.record,
+        durations[min(_gameState.level ~/ 5, durations.length - 1)]));
   }
 
   GameState _onHumanPlay(HumanPlayEvent humanPlayEvent) {
@@ -101,13 +106,16 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     } else {
       Timer(Duration(seconds: 3), () => add(GameEvent.endEvent()));
     }
-    
+
     return _gameState.copyWith(status: GameStatus.loose);
   }
 
   GameState _onHumanCorrect(HumanCorrectEvent humanCorrectEvent) {
+    int nextLevel = _gameState.level + 1;
+    int nextLifes =
+        nextLevel % 5 == 0 ? _gameState.lifes + 1 : _gameState.lifes;
     _gameState = _gameState.copyWith(
-        status: GameStatus.win, level: _gameState.level + 1, lifes: _gameState.level % 5 == 0 ? _gameState.lifes + 1 : _gameState.lifes);
+        status: GameStatus.win, level: nextLevel, lifes: nextLifes);
     Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
     return _gameState;
   }
@@ -133,11 +141,12 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     if (lightId != _gameState.record[indexHumanPlay]) {
       lightSubscription.cancel();
       add(GameEvent.humanErrorEvent());
-    }
-    indexHumanPlay++;
-    if (indexHumanPlay >= _gameState.record.length) {
-      lightSubscription.cancel();
-      add(GameEvent.humanCorrectEvent());
+    } else {
+      indexHumanPlay++;
+      if (indexHumanPlay >= _gameState.record.length) {
+        lightSubscription.cancel();
+        add(GameEvent.humanCorrectEvent());
+      }
     }
   }
 }

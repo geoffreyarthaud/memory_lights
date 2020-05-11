@@ -5,10 +5,12 @@ import 'events.dart';
 class PlayEvent extends AbstractEvent {
   final List<int> record;
 
-  @override
-  List<Object> get props => record;
+  final int duration;
 
-  PlayEvent(this.record);
+  @override
+  List<Object> get props => [record, duration];
+
+  PlayEvent(this.record, this.duration);
 
   @override
   String toString() => 'Play Event $record';
@@ -36,8 +38,8 @@ class PlayRecordEvent extends
       Union5<PlayEvent, PauseEvent, ResumeEvent, StopEvent, TickEvent> union
   ) : super(union);
 
-  factory PlayRecordEvent.play(List<int> record)
-    => PlayRecordEvent._(_factory.first(PlayEvent(record)));
+  factory PlayRecordEvent.play(List<int> record, int duration)
+    => PlayRecordEvent._(_factory.first(PlayEvent(record, duration)));
   
   factory PlayRecordEvent.pause()
     => PlayRecordEvent._(_factory.second(PauseEvent()));
