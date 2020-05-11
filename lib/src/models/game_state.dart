@@ -8,7 +8,6 @@ class GameState {
   final int level;
   final int lifes;
   final int score;
-  final int nbTry;
   final GameStatus status;
   final List<int> record;
   GameState({
@@ -16,7 +15,6 @@ class GameState {
     this.level,
     this.lifes,
     this.score,
-    this.nbTry,
     this.status,
     this.record,
   });
@@ -26,7 +24,6 @@ class GameState {
     int level,
     int lifes,
     int score,
-    int nbTry,
     GameStatus status,
     List<int> record,
   }) {
@@ -35,7 +32,6 @@ class GameState {
       level: level ?? this.level,
       lifes: lifes ?? this.lifes,
       score: score ?? this.score,
-      nbTry: nbTry ?? this.nbTry,
       status: status ?? this.status,
       record: record ?? this.record,
     );
@@ -43,7 +39,7 @@ class GameState {
 
   @override
   String toString() {
-    return 'GameState(nbCells: $nbCells, level: $level, lifes: $lifes, score: $score, nbTry: $nbTry, status: $status, record: $record)';
+    return 'GameState(nbCells: $nbCells, level: $level, lifes: $lifes, score: $score, status: $status, record: $record)';
   }
 
   @override
@@ -55,7 +51,6 @@ class GameState {
       o.level == level &&
       o.lifes == lifes &&
       o.score == score &&
-      o.nbTry == nbTry &&
       o.status == status &&
       listEquals(o.record, record);
   }
@@ -66,7 +61,6 @@ class GameState {
       level.hashCode ^
       lifes.hashCode ^
       score.hashCode ^
-      nbTry.hashCode ^
       status.hashCode ^
       record.hashCode;
   }
@@ -77,7 +71,6 @@ class GameState {
       'level': level,
       'lifes': lifes,
       'score': score,
-      'nbTry': nbTry,
       'status': status,
       'record': record,
     };
@@ -91,7 +84,6 @@ class GameState {
       level: map['level'],
       lifes: map['lifes'],
       score: map['score'],
-      nbTry: map['nbTry'],
       status: map['status'],
       record: List<int>.from(map['record']),
     );

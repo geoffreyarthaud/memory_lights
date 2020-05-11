@@ -107,7 +107,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
 
   GameState _onHumanCorrect(HumanCorrectEvent humanCorrectEvent) {
     _gameState = _gameState.copyWith(
-        status: GameStatus.win, level: _gameState.level + 1);
+        status: GameStatus.win, level: _gameState.level + 1, lifes: _gameState.level % 5 == 0 ? _gameState.lifes + 1 : _gameState.lifes);
     Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
     return _gameState;
   }

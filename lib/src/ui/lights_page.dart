@@ -91,7 +91,7 @@ class LightsPage extends StatelessWidget {
         return RaisedButton(
             onPressed: () => gameEngineBloc.add(GameEvent.startEvent()),
             color: Colors.purple,
-            child: const Text('▶️', style: TextStyle(fontSize: 40)));
+            child: const Text('GO !', style: TextStyle(fontSize: 40)));
     }
   }
 
