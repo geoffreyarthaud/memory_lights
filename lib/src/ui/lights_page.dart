@@ -27,6 +27,14 @@ class LightsPage extends StatelessWidget {
           return Scaffold(
               appBar: AppBar(
                 title: Text(title),
+                actions: <Widget>[
+                  IconButton(
+                    icon: const Icon(Icons.refresh),
+                    tooltip: 'Restart',
+                    onPressed: () {
+                      gameEngineBloc.add(GameEvent.endEvent());
+                    },
+                  )]
               ),
               body: Column(children: <Widget>[
                 Expanded(
@@ -62,10 +70,10 @@ class LightsPage extends StatelessWidget {
                 )),
                 Row(children: [
                   Expanded(
-                      child: Text(state.lifes > 5 ? '❤️ x ' + state.lifes.toString() : '❤️'*state.lifes,
+                      child: Text(_getLeftFooterText(state),
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 15))),
-                  Text('Level : ' + state.level.toString(),
+                  Text(_getRightFooterTest(state),
                       textAlign: TextAlign.right,
                       style: TextStyle(fontSize: 15)),
                 ])
@@ -74,6 +82,14 @@ class LightsPage extends StatelessWidget {
   }
 
   Container _emptyCell() => Container(padding: const EdgeInsets.all(8));
+
+  String _getLeftFooterText(GameState state) {
+    return 'Level : ' + state.level.toString() + ' ' + (state.lifes > 5 ? '❤️ x ' + state.lifes.toString() : '❤️'*state.lifes);
+  }
+
+  String _getRightFooterTest(GameState state) {
+    return 'Score : ' + state.score.toString();
+  }
 
   Widget centerAction(GameState gameState) {
     switch (gameState.status) {
@@ -100,7 +116,7 @@ class LightsPage extends StatelessWidget {
   }
 
   Widget _centerText(String text, Color backgroundColor) {
-    return Container(padding: const EdgeInsets.all(8), color: backgroundColor, 
+    return Container(padding: const EdgeInsets.all(8), 
               child: Center(
                 child: Text(text, textAlign: TextAlign.center, style: TextStyle(fontSize: 40))));
   }

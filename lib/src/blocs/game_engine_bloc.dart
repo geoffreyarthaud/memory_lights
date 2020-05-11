@@ -57,6 +57,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   GameState _onStart(StartEvent startEvent) {
+
     if (startEvent.gameState == null ||
         startEvent.gameState.status == GameStatus.setup) {
       _gameState = _gameState.copyWith(
@@ -111,16 +112,23 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
   }
 
   GameState _onHumanCorrect(HumanCorrectEvent humanCorrectEvent) {
+    int nextScore = _gameState.score + 100 + _gameState.lifes;
     int nextLevel = _gameState.level + 1;
     int nextLifes =
         nextLevel % 5 == 0 ? _gameState.lifes + 1 : _gameState.lifes;
     _gameState = _gameState.copyWith(
-        status: GameStatus.win, level: nextLevel, lifes: nextLifes);
+        status: GameStatus.win,
+        score : nextScore,
+        level: nextLevel,
+        lifes: nextLifes);
     Timer(Duration(seconds: 3), () => add(GameEvent.startEvent()));
     return _gameState;
   }
 
   GameState _onEnded(EndEvent endEvent) {
+    lightSubscription?.cancel();
+    playRecordSubscription?.cancel();
+    playRecordBloc.add(PlayRecordEvent.stop());
     _gameState = initialGameState;
     return _gameState;
   }
@@ -130,6 +138,7 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
       detectPlayRecordStop = true;
     } else if (detectPlayRecordStop && ps is Stopped) {
       playRecordSubscription.cancel();
+      playRecordSubscription = null;
       add(GameEvent.humanPlayEvent());
     }
   }
@@ -140,11 +149,13 @@ class GameEngineBloc extends Bloc<GameEvent, GameState> {
     }
     if (lightId != _gameState.record[indexHumanPlay]) {
       lightSubscription.cancel();
+      lightSubscription = null;
       add(GameEvent.humanErrorEvent());
     } else {
       indexHumanPlay++;
       if (indexHumanPlay >= _gameState.record.length) {
         lightSubscription.cancel();
+        lightSubscription = null;
         add(GameEvent.humanCorrectEvent());
       }
     }

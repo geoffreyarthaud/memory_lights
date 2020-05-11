@@ -138,19 +138,16 @@ void main() {
         emitsInOrder([
           GameEngineBloc.initialGameState,
           loadedState,
-          loadedState.copyWith(
-              status: GameStatus.win, level: loadedState.level + 1)
+          predicate((gs) => gs.status == GameStatus.win)
         ]));
   });
-}
 
-StreamSubscription<T> mockStream<T>(Invocation invocation, List<T> fromList) {
-  return Stream.fromIterable(fromList)
-      .listen(invocation.positionalArguments[0]);
-}
 
-void mockStates<S>(Bloc<dynamic, S> bloc, List<S> states) {
-  when(bloc.listen(any)).thenAnswer((i) => mockStream(i, states));
+  testScoreAugmented(123, 2);
+  testScoreAugmented(456, 5);
+  testScoreAugmented(0, 3);
+  testScoreAugmented(1203, 15);
+  
 }
 
 void testMistakes(List<int> record, List<int> humanPlay) {
@@ -169,8 +166,39 @@ void testMistakes(List<int> record, List<int> humanPlay) {
         emitsInOrder([
           GameEngineBloc.initialGameState,
           loadedState,
-          loadedState.copyWith(
-              status: GameStatus.loose, lifes: loadedState.lifes - 1)
+          predicate((gs) => gs.status == GameStatus.loose)
         ]));
   });
+}
+
+void testScoreAugmented(int initialScore, int initialLifes) {
+    test('When human wins from score ' + initialScore.toString() + ' and ' + initialLifes.toString() + ' lifes, his score is augmented by 100 + number of lifes', () {
+    // GIVEN
+    mockStates(mockLightBloc, [-1, 2, 0, 4, 0, 1, 0, 3]);
+    var loadedState = GameEngineBloc.initialGameState
+        .copyWith(record: [2, 4, 1, 3], score: initialScore, level: 2, lifes: initialLifes, status: GameStatus.reproduce);
+
+    // WHEN
+    gameEngine.add(GameEvent.startEvent(gameState: loadedState));
+
+    // THEN
+    expect(
+        gameEngine,
+        emitsInOrder([
+          GameEngineBloc.initialGameState,
+          loadedState,
+          predicate((gs) => gs.score == initialScore + 100 + initialLifes)
+        ]));
+  });
+}
+
+
+
+StreamSubscription<T> mockStream<T>(Invocation invocation, List<T> fromList) {
+  return Stream.fromIterable(fromList)
+      .listen(invocation.positionalArguments[0]);
+}
+
+void mockStates<S>(Bloc<dynamic, S> bloc, List<S> states) {
+  when(bloc.listen(any)).thenAnswer((i) => mockStream(i, states));
 }
